@@ -18,10 +18,17 @@ let conformanceSourcesArgument = parser.add(option: "--conformances", shortName:
 let localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The directory where the localisation files are to be placed. The default path is <source files>/Localisations.")
 
 do {
+	
 	let result = try parser.parse(.init(arguments))
 	guard let sourcesPath = result.get(sourcesArgument)?.path else { throw ArgumentError.noSourcesPath }
 	let source = try Source(at: URL(fileURLWithPath: sourcesPath.asString, isDirectory: false))
-	print(source.declarations, source.issues)
+	
+	let localisableStringTypes = LocalisableStringType.types(in: source)
+	let conformances = localisableStringTypes.map { $0.generatedConformance() }
+	for c in conformances {
+		print(c)
+	}
+	
 } catch {
 	print(error)
 }

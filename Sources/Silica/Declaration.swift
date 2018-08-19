@@ -111,12 +111,12 @@ enum Declaration : Decodable {
 		
 	}
 	
-	enum Accessibility : String, Codable {
-		case `open` = "source.lang.swift.accessibility.open"
-		case `public` = "source.lang.swift.accessibility.public"
-		case `internal` = "source.lang.swift.accessibility.internal"
-		case `fileprivate` = "source.lang.swift.accessibility.fileprivate"
+	enum Accessibility : String, Codable, Equatable, CaseIterable {
 		case `private` = "source.lang.swift.accessibility.private"
+		case `fileprivate` = "source.lang.swift.accessibility.fileprivate"
+		case `internal` = "source.lang.swift.accessibility.internal"
+		case `public` = "source.lang.swift.accessibility.public"
+		case `open` = "source.lang.swift.accessibility.open"
 	}
 	
 	enum CodingKey : Swift.CodingKey {
@@ -127,4 +127,10 @@ enum Declaration : Decodable {
 		case inheritedTypes
 	}
 	
+}
+
+extension Declaration.Accessibility : Comparable {
+	static func < (smaller: Declaration.Accessibility, greater: Declaration.Accessibility) -> Bool {
+		return allCases.index(of: smaller)! < allCases.index(of: greater)!
+	}
 }
