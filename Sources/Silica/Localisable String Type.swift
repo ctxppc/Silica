@@ -45,16 +45,15 @@ final class LocalisableStringType {
 	/// Creates a localisable string type.
 	init(fullyQualifiedNamePath: [String], caseNames: [String]) {
 		self.fullyQualifiedNamePath = fullyQualifiedNamePath
+		self.fullyQualifiedName = fullyQualifiedNamePath.joined(separator: ".")
 		self.caseNames = caseNames
 	}
 	
-	/// The name of the type.
+	/// The decomposed fully qualified name of the type.
 	let fullyQualifiedNamePath: [String]
 	
-	/// The name of the type.
-	var fullyQualifiedName: String {
-		return fullyQualifiedNamePath.joined(separator: ".")
-	}
+	/// The fully qualified name of the type.
+	let fullyQualifiedName: String
 	
 	/// The case names.
 	let caseNames: [String]

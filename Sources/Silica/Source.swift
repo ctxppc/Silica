@@ -7,6 +7,11 @@ import SourceKittenFramework
 /// A file containing Swift source code.
 final class Source {
 	
+	/// Returns a Boolean value indicating whether the file at given location is a source file.
+	static func isSource(at url: URL) throws -> Bool {
+		return try url.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier == "public.swift-source"
+	}
+	
 	/// Creates and loads a source from a file at a given location.
 	///
 	/// - Parameter url: The location of the source file.
