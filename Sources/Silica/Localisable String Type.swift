@@ -12,13 +12,13 @@ final class LocalisableStringType {
 				
 				guard accessibility >= .internal else { return [] }
 				
-				let caseNames = members.compactMap { member -> String? in
-					guard case .case(name: let name, parameters: _) = member else { return nil }
-					return name
+				let cases = members.compactMap { member -> Case? in
+					guard case .case(name: let name, parameters: let parameters) = member else { return nil }
+					return Case(name: name, parameters: parameters)
 				}
 				
-				guard !caseNames.isEmpty else { return [] }
-				return [.init(fullyQualifiedNamePath: fullyQualifiedNamePath.appending(name), caseNames: caseNames)]
+				guard !cases.isEmpty else { return [] }
+				return [.init(fullyQualifiedNamePath: fullyQualifiedNamePath.appending(name), cases: cases)]
 				
 			}
 			
@@ -43,10 +43,10 @@ final class LocalisableStringType {
 	}
 	
 	/// Creates a localisable string type.
-	init(fullyQualifiedNamePath: [String], caseNames: [String]) {
+	init(fullyQualifiedNamePath: [String], cases: [Case]) {
 		self.fullyQualifiedNamePath = fullyQualifiedNamePath
 		self.fullyQualifiedName = fullyQualifiedNamePath.joined(separator: ".")
-		self.caseNames = caseNames
+		self.cases = cases
 	}
 	
 	/// The decomposed fully qualified name of the type.
@@ -55,13 +55,17 @@ final class LocalisableStringType {
 	/// The fully qualified name of the type.
 	let fullyQualifiedName: String
 	
-	/// The case names.
-	let caseNames: [String]
+	/// The cases.
+	let cases: [Case]
+	struct Case {
+		let name: String
+		let parameters: [Declaration.Parameter]
+	}
 	
 }
 
 extension LocalisableStringType : CustomDebugStringConvertible {
 	var debugDescription: String {
-		return "<Localisable string type \(fullyQualifiedName) with cases \(caseNames)>"
+		return "<Localisable string type \(fullyQualifiedName) with cases \(cases)>"
 	}
 }
