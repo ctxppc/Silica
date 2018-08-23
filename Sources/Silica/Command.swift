@@ -5,35 +5,44 @@ import Utility
 
 /// The Silica command.
 final class Command : Operation {
-	override func main() {
+	
+	override init() {
 		
-		let arguments = CommandLine.arguments.dropFirst()
-		let parser = ArgumentParser(
+		parser = ArgumentParser(
 			usage:		"<source file(s)> -o <output file(s)> -l <localisation files>",
 			overview:	"Generates localisable string files from Swift source files."
 		)
 		
-		let sourcesArgument = parser.add(positional: "source files", kind: PathArgument.self, optional: true, usage: "The source file or the root directory containing the source files to process. When running Silica as part of an Xcode build phase, omit this parameter to use the input files/directories or, if no inputs provided, the source root.")
-		let conformanceArgument = parser.add(option: "--output", shortName: "-o", kind: PathArgument.self, usage: "The file where the generated protocol and its conformances are to be placed. When running Silica as part of an Xcode build phase, omit this option to write to the phase's output file or directory. The default value is “Localisable String.swift” under the source root.")
-//		let localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The directory where the localisation files are to be placed. No localisation files are generated if this option is omitted.")
+		sourcesArgument = parser.add(positional: "source files", kind: PathArgument.self, optional: true, usage: "The source file or the root directory containing the source files to process. When running Silica as part of an Xcode build phase, omit this parameter to use the input files/directories or, if no inputs provided, the source root.")
+		conformanceArgument = parser.add(option: "--output", shortName: "-o", kind: PathArgument.self, usage: "The file where the generated protocol and its conformances are to be placed. When running Silica as part of an Xcode build phase, omit this option to write to the phase's output file or directory. The default value is “Localisable String.swift” under the source root.")
+		localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The directory where the localisation files are to be placed. No localisation files are generated if this option is omitted.")
 		
-		let result: ArgumentParser.Result
+		super.init()
+		
+	}
+	
+	private let parser: ArgumentParser
+	private let sourcesArgument: PositionalArgument<PathArgument>
+	private let conformanceArgument: OptionArgument<PathArgument>
+	private let localisationsArgument: OptionArgument<PathArgument>
+	
+	private let arguments = CommandLine.arguments.dropFirst()
+	private let environment = ProcessInfo.processInfo.environment
+	
+	override func main() {
 		do {
-			result = try parser.parse(.init(arguments))
+			try run()
 		} catch {
-			print("error: could not parse arguments: \(error)")
-			exit(1)
+			self.error = error
 		}
+	}
+	
+	private func run() throws {
 		
-		let environment = ProcessInfo.processInfo.environment
+		let result = try parser.parse(.init(arguments))
 		
-		let sourceRootURL: Foundation.URL
-		if let sourcesPath = result.get(sourcesArgument)?.path.asString ?? environment["SCRIPT_INPUT_FILE_0"] ?? environment["SRCROOT"] {
-			sourceRootURL = URL(fileURLWithPath: sourcesPath)
-		} else {
-			print("error: no source path given")
-			exit(1)
-		}
+		guard let sourceRootPath = result.get(sourcesArgument)?.path.asString ?? environment["SCRIPT_INPUT_FILE_0"] ?? environment["SRCROOT"] else { throw Error.noSourcePath }
+		let sourceRootURL = URL(fileURLWithPath: sourceRootPath)
 		
 		let generatedSourcesURL: Foundation.URL
 		if let generatedSourcesPath = result.get(conformanceArgument)?.path.asString ?? environment["SCRIPT_OUTPUT_FILE_0"] {
@@ -44,9 +53,26 @@ final class Command : Operation {
 		
 		let operation = GenerationOperation(sourcesAt: sourceRootURL, generatingAt: generatedSourcesURL)
 		operation.start()
-		if operation.hasErrors {
-			exit(1)
+		if let error = operation.error {
+			throw error
 		}
 		
 	}
+	
+	enum Error : Swift.Error, CustomStringConvertible {
+		
+		case noSourcePath
+		
+		// See protocol.
+		var description: String {
+			switch self {
+				case .noSourcePath:	return "no source path given"
+			}
+		}
+		
+	}
+	
+	/// An error thrown while performing the operation, or `nil` if the operation hasn't been started or if no error occurred.
+	var error: Swift.Error?
+	
 }

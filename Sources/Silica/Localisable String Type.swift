@@ -13,7 +13,7 @@ final class LocalisableStringType {
 				guard accessibility >= .internal else { return [] }
 				
 				let caseNames = members.compactMap { member -> String? in
-					guard case .case(name: let name) = member else { return nil }
+					guard case .case(name: let name, parameters: _) = member else { return nil }
 					return name
 				}
 				
