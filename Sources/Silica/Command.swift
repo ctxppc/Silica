@@ -51,7 +51,9 @@ final class Command : Operation {
 			generatedSourcesURL = sourceRootURL.appendingPathComponent("Localisable String.swift", isDirectory: false)
 		}
 		
-		let operation = GenerationOperation(sourcesAt: sourceRootURL, generatingAt: generatedSourcesURL)
+		let localisationTableURL = result.get(localisationsArgument).flatMap { URL(fileURLWithPath: $0.path.asString) }
+		
+		let operation = GenerationOperation(sourcesAt: sourceRootURL, generatingAt: generatedSourcesURL, tableAt: localisationTableURL)
 		operation.start()
 		if let error = operation.error {
 			throw error

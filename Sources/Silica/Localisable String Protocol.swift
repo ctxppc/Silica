@@ -2,7 +2,7 @@
 
 let localisableStringProtocol = """
 /// A value that can provide a localisable string.
-protocol \(LocalisableStringType.localisableStringProtocolName) {
+protocol \(LocalisableStringType.protocolName) {
 	
 	/// An identifier that groups localisable strings.
 	///
@@ -20,12 +20,12 @@ protocol \(LocalisableStringType.localisableStringProtocolName) {
 	
 }
 
-extension \(LocalisableStringType.localisableStringProtocolName) {
+extension \(LocalisableStringType.protocolName) {
 
 	var localised: String {
 		
 		let domain = type(of: self).domain
-		let errorPattern = "(No translation available for \\(domain).\\(identifier))"
+		let errorPattern = "(No translation available for \\(identifier) in \\(domain).)"
 		let pattern = Bundle.main.localizedString(forKey: identifier, value: errorPattern, table: domain)
 		
 		guard pattern != errorPattern else {

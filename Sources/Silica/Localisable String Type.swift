@@ -2,13 +2,13 @@
 
 final class LocalisableStringType {
 	
-	static let localisableStringProtocolName = "LocalisableString"
+	static let protocolName = "LocalisableString"
 	
 	/// Returns all localisable string types in given declaration.
 	static func types(in declaration: Declaration, fullyQualifiedNamePath: [String]) -> [LocalisableStringType] {
 		switch declaration {
 			
-			case .type(kind: .enum, name: let name, conformances: let conformances, accessibility: let accessibility, members: let members) where conformances.contains(localisableStringProtocolName): do {
+			case .type(kind: .enum, name: let name, conformances: let conformances, accessibility: let accessibility, members: let members) where conformances.contains(protocolName): do {
 				
 				guard accessibility >= .internal else { return [] }
 				
@@ -44,22 +44,63 @@ final class LocalisableStringType {
 	
 	/// Creates a localisable string type.
 	init(fullyQualifiedNamePath: [String], cases: [Case]) {
-		self.fullyQualifiedNamePath = fullyQualifiedNamePath
-		self.fullyQualifiedName = fullyQualifiedNamePath.joined(separator: ".")
+		
+		fullyQualifiedName = fullyQualifiedNamePath.joined(separator: ".")
+		shortenedFullyQualifiedName = fullyQualifiedNamePath.map {
+			$0.replacingOccurrences(of: "ViewController", with: "", options: [.anchored, .backwards]).replacingOccurrences(of: "String", with: "", options: [.anchored, .backwards])
+		}.joined(separator: ".")
+		
 		self.cases = cases
+		
 	}
-	
-	/// The decomposed fully qualified name of the type.
-	let fullyQualifiedNamePath: [String]
 	
 	/// The fully qualified name of the type.
 	let fullyQualifiedName: String
 	
+	/// The fully qualified name of the type with "ViewController" and "String" suffixes removed.
+	let shortenedFullyQualifiedName: String
+	
 	/// The cases.
 	let cases: [Case]
 	struct Case {
+		
+		/// The base name of the case.
 		let name: String
+		
+		/// The parameters of the associated values, if any.
 		let parameters: [Declaration.Parameter]
+		
+		/// The identifier used for localisation, including any placeholders for parameters.
+		///
+		/// - Parameter domain: The domain to include in the identifier, or `nil` to produce an unqualified identifier.
+		func localisationIdentifier(withDomain domain: String?) -> String {
+			
+			func placeholder(for parameter: Declaration.Parameter) -> String {
+				switch parameter.type {
+					case "Int":		return "%ld"
+					case "Double":	return "%f"
+					default:		return "%@"
+				}
+			}
+			
+			let parameterList: String = parameters.map { parameter in
+				if let name = parameter.name {
+					return "\(name): \(placeholder(for: parameter))"
+				} else {
+					return placeholder(for: parameter)
+				}
+			}.joined(separator: ", ")
+			
+			let unqualifiedIdentifier = parameters.isEmpty ? name : "\(name)(\(parameterList))"
+			
+			if let domain = domain {
+				return "\(domain).\(unqualifiedIdentifier)"
+			} else {
+				return unqualifiedIdentifier
+			}
+			
+		}
+		
 	}
 	
 }

@@ -3,36 +3,15 @@
 extension LocalisableStringType {
 	
 	/// Returns Swift source text containing generated conformances for the localisable string type.
-	func generatedConformance(indentation: String = "\t") -> String {
+	///
+	/// - Parameter indentation: A single layer of indentation. The default value is a single horizontal tab.
+	/// - Parameter commonDomain: The common domain, or `nil` if the string type defines its own domain.
+	func generatedConformance(indentation: String = "\t", commonDomain: String?) -> String {
 		
-		let identifierSwitchBody = cases.map { c -> String in
-			
-			func placeholder(for parameter: Declaration.Parameter) -> String {
-				switch parameter.type {
-					case "Int":		return "%ld"
-					case "Double":	return "%f"
-					default:		return "%@"
-				}
-			}
-			
-			let parameterList: String = c.parameters.map { parameter in
-				if let name = parameter.name {
-					return "\(name): \(placeholder(for: parameter))"
-				} else {
-					return placeholder(for: parameter)
-				}
-			}.joined(separator: ", ")
-			
-			let identifierValue: String
-			if c.parameters.isEmpty {
-				identifierValue = c.name
-			} else {
-				identifierValue = "\(c.name)(\(parameterList))"
-			}
-			
-			return "\(indentation * 3)case .\(c.name):\(indentation)return \"\(identifierValue)\""
-			
-		}.joined(separator: "\n")
+		let usingCommonDomain = commonDomain != nil
+		let identifiersSwitchBody = cases
+			.map { c in "\(indentation * 3)case .\(c.name):\(indentation)return \"\(c.localisationIdentifier(withDomain: usingCommonDomain ? shortenedFullyQualifiedName : nil))\"" }
+			.joined(separator: "\n")
 		
 		let argumentsBody: String
 		if cases.contains(where: { !$0.parameters.isEmpty }) {
@@ -78,12 +57,12 @@ extension LocalisableStringType {
 		extension \(fullyQualifiedName) {
 		
 		\(indentation)static var domain: String {
-		\(indentation * 2)return \"\(fullyQualifiedName)\"
+		\(indentation * 2)return \"\(commonDomain ?? shortenedFullyQualifiedName)\"
 		\(indentation)}
 		
 		\(indentation)var identifier: String {
 		\(indentation * 2)switch self {
-		\(identifierSwitchBody)
+		\(identifiersSwitchBody)
 		\(indentation * 2)}
 		\(indentation)}
 		

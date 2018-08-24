@@ -6,9 +6,10 @@ import Foundation
 final class GenerationOperation : Operation {
 	
 	/// Creates a task with given source root URL and generated sources URL.
-	init(sourcesAt sourcesURL: URL, generatingAt generatedSourcesURL: URL) {
+	init(sourcesAt sourcesURL: URL, generatingAt generatedSourcesURL: URL, tableAt tableURL: URL?) {
 		self.sourcesURL = sourcesURL
 		self.generatedSourcesURL = generatedSourcesURL
+		self.tableURL = tableURL
 	}
 	
 	/// The location of the sources. It must be a readable file or directory.
@@ -16,6 +17,9 @@ final class GenerationOperation : Operation {
 	
 	/// The location of the generated sources. It must be a writeable file or directory.
 	let generatedSourcesURL: URL
+	
+	/// The location of the localisation table.
+	let tableURL: URL?
 	
 	override func main() {
 		do {
@@ -29,11 +33,28 @@ final class GenerationOperation : Operation {
 		
 		let sources = try SourceRoot(at: sourcesURL).sources
 		let localisableStringTypes = sources.flatMap { LocalisableStringType.types(in: $0) }
-		
-		let conformances = localisableStringTypes.map { (name: $0.fullyQualifiedName, body: $0.generatedConformance()) }
-		if conformances.isEmpty {
+		if localisableStringTypes.isEmpty {
 			print("warning: Silica did not find any LocalisableString types across \(sources.count) source\(sources.count == 1 ? "" : "s") in \(sourcesURL).")
 		}
+		
+		let commonDomain: String?
+		if let tableURL = tableURL {
+			
+			guard tableURL.pathExtension.caseInsensitiveCompare("strings") == .orderedSame else { throw TableError.unsupportedFormat }
+			let table = try LocalisationTable(at: tableURL)
+			commonDomain = tableURL.deletingPathExtension().lastPathComponent
+			
+			for type in localisableStringTypes {
+				type.update(table, usingCommonDomain: true)
+			}
+			
+			try table.save()
+			
+		} else {
+			commonDomain = nil
+		}
+		
+		let conformances = localisableStringTypes.map { (name: $0.fullyQualifiedName, body: $0.generatedConformance(commonDomain: commonDomain)) }
 		
 		if generatedSourcesURL.pathExtension.caseInsensitiveCompare("swift") == .orderedSame {
 			try """
@@ -71,5 +92,17 @@ final class GenerationOperation : Operation {
 	
 	/// An error thrown while performing the operation, or `nil` if the operation hasn't been started or if no error occurred.
 	var error: Error?
+	
+	enum TableError : Error, CustomStringConvertible {
+		
+		case unsupportedFormat
+		
+		var description: String {
+			switch self {
+				case .unsupportedFormat:	return "This localisation table format is not supported by Silica."
+			}
+		}
+		
+	}
 	
 }
