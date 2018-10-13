@@ -31,7 +31,7 @@ final class GenerationOperation : Operation {
 	
 	private func run() throws {
 		
-		let sources = try SourceRoot(at: sourcesURL).sources
+		let sources = try Module(at: sourcesURL).sources
 		let localisableStringTypes = sources.flatMap { LocalisableStringType.types(in: $0) }
 		if localisableStringTypes.isEmpty {
 			print("warning: Silica did not find any LocalisableString types across \(sources.count) source\(sources.count == 1 ? "" : "s") in \(sourcesURL).")
