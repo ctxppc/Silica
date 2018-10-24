@@ -15,6 +15,6 @@ protocol NamedDeclaration : Declaration {
 
 extension NamedDeclaration {
 	var localQualifiedName: String {
-		return "\(ancestors.map { $0.qualifyingName }.joined(separator: ".")).\(name)"
+		return "\(ancestors.compactMap { ($0 as? ScopingDeclaration)?.qualifyingName }.joined(separator: ".")).\(name)"
 	}
 }

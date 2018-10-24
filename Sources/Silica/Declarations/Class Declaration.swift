@@ -3,10 +3,10 @@
 import DepthKit
 import SourceKittenFramework
 
-final class StructureTypeDeclaration : TypeDeclaration {
+final class ClassDeclaration : TypeDeclaration {
 	
 	// See protocol.
-	static let kind = SwiftDeclarationKind.struct
+	static let kind = SwiftDeclarationKind.class
 	
 	// See protocol.
 	init(from decoder: Decoder) throws {

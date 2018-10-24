@@ -38,15 +38,20 @@ final class Source {
 	/// The structure of a source.
 	private struct Structure : Decodable {
 		
+		// See protocol.
 		init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKey.self)
-			declarations = try container.decodeIfPresent(key: .declarations) ?? []
+			declarations = try container.decode([AnyDeclaration].self, forKey: .declarations).compactMap { $0.base }
 			issues = try container.decodeIfPresent(key: .issues) ?? []
 		}
 		
+		/// The declarations in the source.
 		let declarations: [Declaration]
+		
+		/// The diagnosed issues in the source.
 		let issues: [Issue]
 		
+		// See protocol.
 		enum CodingKey : String, Swift.CodingKey {
 			case declarations = "substructure"
 			case issues = "diagnostics"

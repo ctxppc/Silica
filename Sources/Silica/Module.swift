@@ -59,13 +59,7 @@ final class Module {
 	/// - Returns: The declaration for the type named `name`, or `nil` if no such declaration exists in the module.
 	func typeDeclaration(withName name: String) -> Declaration? {
 		return sources.lazy.compactMap { source in
-			source.declarations.first { declaration in
-				if case .type(kind: _, name: let n, conformances: _, accessibility: _, members: _) = declaration {
-					return n == name
-				} else {
-					return false
-				}
-			}
+			source.declarations.first { ($0 as? NamedDeclaration)?.name == name }
 		}.first
 	}
 	

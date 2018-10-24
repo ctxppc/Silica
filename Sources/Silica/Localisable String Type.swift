@@ -68,15 +68,15 @@ final class LocalisableStringType {
 		let name: String
 		
 		/// The parameters of the associated values, if any.
-		let parameters: [Declaration.Parameter]
+		let parameters: [Parameter]
 		
 		/// The identifier used for localisation, including any placeholders for parameters.
 		///
 		/// - Parameter domain: The domain to include in the identifier, or `nil` to produce an unqualified identifier.
 		func localisationIdentifier(withDomain domain: String?) -> String {
 			
-			func placeholder(for parameter: Declaration.Parameter) -> String {
-				switch parameter.type {
+			func placeholder(for parameter: Parameter) -> String {
+				switch parameter.argumentType {
 					case "Int":		return "%ld"
 					case "Double":	return "%f"
 					default:		return "%@"

@@ -9,7 +9,9 @@ protocol ScopingDeclaration : Declaration {
 	var qualifyingName: String { get }
 	
 	/// The declarations scoped within `self`.
-	var children: [Declaration] { get }
+	///
+	/// - Invariant: For each member `m` in `members`, `m.parent === self`.
+	var members: [Declaration] { get }
 	
 }
 
