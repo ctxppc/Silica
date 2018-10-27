@@ -21,13 +21,13 @@ final class Module {
 		
 		var enumerationError: Error?
 		let enumerator = FileManager.default.enumerator(
-			at: url,
-			includingPropertiesForKeys: [.typeIdentifierKey],
-			options: [.skipsPackageDescendants],
-			errorHandler: { _, error in
-				enumerationError = error
-				return false
-			}
+			at:							url,
+			includingPropertiesForKeys:	[.typeIdentifierKey],
+			options:					[.skipsPackageDescendants],
+			errorHandler:				{ _, error in
+											enumerationError = error
+											return false
+										}
 		)
 		
 		guard let urls = enumerator else {
@@ -66,7 +66,13 @@ final class Module {
 }
 
 extension Module : LocalisableStringEntryProvider {
-	var localisableEntries: [LocalisableEntry] {
+	var localisableEntries: [LocalisableStringEntry] {
 		return sources.flatMap { $0.localisableEntries }
+	}
+}
+
+extension Module : LocalisableStringConformanceProvider {
+	var localisableStringConformances: [LocalisableStringConformance] {
+		return sources.flatMap { $0.localisableStringConformances }
 	}
 }

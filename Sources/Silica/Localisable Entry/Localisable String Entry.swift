@@ -1,7 +1,7 @@
 // Silica © 2018 Constantino Tsarouhas
 
 /// An entry in a localisation table, without localised value.
-struct LocalisableEntry {
+struct LocalisableStringEntry {
 	
 	/// The name of the entry.
 	let name: String
@@ -46,12 +46,12 @@ struct LocalisableEntry {
 	
 }
 
-extension LocalisableEntry.Parameter {
+extension LocalisableStringEntry.Parameter {
 	
 	/// Creates a localisable entry parameter that mirrors a given parameter declaration.
 	init(for parameter: Parameter) {
 		
-		let type: LocalisableEntry.Parameter.ValueType
+		let type: LocalisableStringEntry.Parameter.ValueType
 		switch parameter.argumentType {
 			case "Int":		type = .integer
 			case "Double":	type = .floatingPoint

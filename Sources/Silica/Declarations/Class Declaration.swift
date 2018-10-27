@@ -35,10 +35,3 @@ final class ClassDeclaration : TypeDeclaration {
 	let members: [Declaration]
 	
 }
-
-extension ClassDeclaration : LocalisableStringEntryProvider {
-	var localisableEntries: [LocalisableEntry] {
-		guard accessibility >= .internal else { return [] }
-		return members.flatMap { ($0 as? LocalisableStringEntryProvider)?.localisableEntries ?? [] }
-	}
-}

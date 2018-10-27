@@ -95,7 +95,13 @@ final class Source {
 }
 
 extension Source : LocalisableStringEntryProvider {
-	var localisableEntries: [LocalisableEntry] {
+	var localisableEntries: [LocalisableStringEntry] {
 		return declarations.flatMap { ($0 as? LocalisableStringEntryProvider)?.localisableEntries ?? [] }
+	}
+}
+
+extension Source : LocalisableStringConformanceProvider {
+	var localisableStringConformances: [LocalisableStringConformance] {
+		return declarations.flatMap { ($0 as? LocalisableStringConformanceProvider)?.localisableStringConformances ?? [] }
 	}
 }

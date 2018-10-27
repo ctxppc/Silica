@@ -9,13 +9,13 @@ final class Command : Operation {
 	override init() {
 		
 		parser = ArgumentParser(
-			usage:		"<source file(s)> -o <output file(s)> -l <localisation files>",
+			usage:		"<sources> -c <conformances> -l <localisation tables>",
 			overview:	"Generates localisable string files from Swift source files."
 		)
 		
 		sourcesArgument = parser.add(positional: "source files", kind: PathArgument.self, optional: true, usage: "The source file or the root directory containing the source files to process. When running Silica as part of an Xcode build phase, omit this parameter to use the input files/directories or, if no inputs provided, the source root.")
-		conformanceArgument = parser.add(option: "--output", shortName: "-o", kind: PathArgument.self, usage: "The file where the generated protocol and its conformances are to be placed. When running Silica as part of an Xcode build phase, omit this option to write to the phase's output file or directory. The default value is “Localisable String.swift” under the source root.")
-		localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The directory where the localisation files are to be placed. No localisation files are generated if this option is omitted.")
+		conformanceArgument = parser.add(option: "--conformances", shortName: "-c", kind: PathArgument.self, usage: "The file where the generated protocol and its conformances are to be placed. When running Silica as part of an Xcode build phase, omit this option to write to the phase's output file or directory. When not running as part of a build phase, omit this option to write to “Localisable String.swift” under the source root.")
+		localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The localisation table file to create or update. No localisation table is created or updated if this option is omitted.")
 		
 		super.init()
 		
