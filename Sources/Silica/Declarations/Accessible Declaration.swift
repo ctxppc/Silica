@@ -21,4 +21,3 @@ extension DeclarationAccessibility : Comparable {
 		return allCases.index(of: smaller)! < allCases.index(of: greater)!
 	}
 }
-

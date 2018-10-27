@@ -19,6 +19,14 @@ protocol Declaration : class, Decodable {
 
 extension Declaration {
 	
+	/// Decodes the kind in the container and throws an error if it doesn't match `kind`.
+	static func decodeKind(in container: KeyedDecodingContainer<DeclarationCodingKey>) throws {
+		let encodedKind = try container.decode(SwiftDeclarationKind.self, forKey: .kind)
+		if encodedKind != kind {
+			throw DeclarationDecodingError.incorrectKind(encodedKind, expected: kind)
+		}
+	}
+	
 	/// The ancestor declarations of `self`, starting with the parent of `self` and ending with the root declaration in the source.
 	///
 	/// - Invariant: `ancestors.first === parent`.
@@ -26,6 +34,13 @@ extension Declaration {
 		guard let parent = parent else { return .init(EmptyCollection()) }
 		return .init(sequence(first: parent, next: { $0.parent }))
 	}
+	
+}
+
+enum DeclarationDecodingError : Error {
+	
+	/// The container encodes a different kind of declaration than the one expected by `Self`.
+	case incorrectKind(SwiftDeclarationKind, expected: SwiftDeclarationKind)
 	
 }
 

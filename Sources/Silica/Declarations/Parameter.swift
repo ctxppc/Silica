@@ -11,6 +11,7 @@ final class Parameter : Declaration {
 	// See protocol.
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
+		try type(of: self).decodeKind(in: container)
 		name = try container.decode(key: .name)
 		argumentType = try container.decode(key: .typeName)
 	}

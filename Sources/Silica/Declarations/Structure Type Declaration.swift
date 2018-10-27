@@ -1,6 +1,5 @@
 // Silica © 2018 Constantino Tsarouhas
 
-import DepthKit
 import SourceKittenFramework
 
 /// A declaration of a structure type, introduced by the `struct` keyword.
@@ -12,6 +11,7 @@ final class StructureTypeDeclaration : TypeDeclaration {
 	// See protocol.
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
+		try type(of: self).decodeKind(in: container)
 		name = try container.decode(key: .name)
 		accessibility = try container.decode(key: .accessibility)
 		conformances = try container.decode(key: .inheritedTypes)

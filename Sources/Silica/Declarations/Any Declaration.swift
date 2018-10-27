@@ -14,8 +14,18 @@ struct AnyDeclaration : Decodable {
 	]
 	
 	init(from decoder: Decoder) throws {
-		let kind = try decoder.container(keyedBy: DeclarationCodingKey.self).decode(SwiftDeclarationKind.self, forKey: .kind)
-		base = try AnyDeclaration.declarationTypes.first(where: { type in type.kind == kind })?.init(from: decoder)
+		
+		for type in AnyDeclaration.declarationTypes {
+			do {
+				base = try type.init(from: decoder)
+				return
+			} catch DeclarationDecodingError.incorrectKind {
+				continue
+			}
+		}
+		
+		base = nil
+		
 	}
 	
 	/// The declaration, if any.
