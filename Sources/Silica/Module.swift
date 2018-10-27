@@ -64,3 +64,9 @@ final class Module {
 	}
 	
 }
+
+extension Module : LocalisableStringEntryProvider {
+	var localisableEntries: [LocalisableEntry] {
+		return sources.flatMap { $0.localisableEntries }
+	}
+}

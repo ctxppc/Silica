@@ -1,6 +1,6 @@
 // Silica © 2018 Constantino Tsarouhas
 
-protocol TypeDeclaration : ScopingDeclaration, NamedDeclaration {
+protocol TypeDeclaration : ScopingDeclaration, NamedDeclaration, AccessibleDeclaration {
 	
 	/// The types the type declared by `self` conforms to.
 	///

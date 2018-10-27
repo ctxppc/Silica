@@ -1,8 +1,10 @@
 // Conserve © 2018 Constantino Tsarouhas
 
+let localisableStringProtocolName = "LocalisableString"
+
 let localisableStringProtocol = """
 /// A value that can provide a localisable string.
-protocol \(LocalisableStringType.protocolName) {
+protocol \(localisableStringProtocolName) {
 	
 	/// An identifier that groups localisable strings.
 	///
@@ -20,7 +22,7 @@ protocol \(LocalisableStringType.protocolName) {
 	
 }
 
-extension \(LocalisableStringType.protocolName) {
+extension \(localisableStringProtocolName) {
 
 	var localised: String {
 		

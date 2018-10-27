@@ -93,3 +93,9 @@ final class Source {
 	}
 	
 }
+
+extension Source : LocalisableStringEntryProvider {
+	var localisableEntries: [LocalisableEntry] {
+		return declarations.flatMap { ($0 as? LocalisableStringEntryProvider)?.localisableEntries ?? [] }
+	}
+}

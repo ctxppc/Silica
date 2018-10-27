@@ -3,6 +3,7 @@
 import DepthKit
 import SourceKittenFramework
 
+/// A declaration of an enumerated type, introduced by the `enum` keyword.
 final class EnumeratedTypeDeclaration : TypeDeclaration {
 	
 	// See protocol.
@@ -12,6 +13,7 @@ final class EnumeratedTypeDeclaration : TypeDeclaration {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
 		name = try container.decode(key: .name)
+		accessibility = try container.decode(key: .accessibility)
 		conformances = try container.decode(key: .inheritedTypes)
 		members = try container.decode([AnyDeclaration].self, forKey: .substructure).compactMap { $0.base }
 		members.bind(toParent: self)
@@ -19,6 +21,9 @@ final class EnumeratedTypeDeclaration : TypeDeclaration {
 	
 	// See protocol.
 	let name: String
+	
+	// See protocol.
+	let accessibility: DeclarationAccessibility
 	
 	// See protocol.
 	let conformances: [Conformance]

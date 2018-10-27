@@ -3,6 +3,7 @@
 import DepthKit
 import SourceKittenFramework
 
+/// A declaration of a class, introduced by the `class` keyword.
 final class ClassDeclaration : TypeDeclaration {
 	
 	// See protocol.
@@ -12,6 +13,7 @@ final class ClassDeclaration : TypeDeclaration {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
 		name = try container.decode(key: .name)
+		accessibility = try container.decode(key: .accessibility)
 		conformances = try container.decode(key: .inheritedTypes)
 		members = try container.decode([AnyDeclaration].self, forKey: .substructure).compactMap { $0.base }
 		members.bind(toParent: self)
@@ -19,6 +21,9 @@ final class ClassDeclaration : TypeDeclaration {
 	
 	// See protocol.
 	let name: String
+	
+	// See protocol.
+	let accessibility: DeclarationAccessibility
 	
 	// See protocol.
 	let conformances: [Conformance]
@@ -29,4 +34,11 @@ final class ClassDeclaration : TypeDeclaration {
 	// See protocol.
 	let members: [Declaration]
 	
+}
+
+extension ClassDeclaration : LocalisableStringEntryProvider {
+	var localisableEntries: [LocalisableEntry] {
+		guard accessibility >= .internal else { return [] }
+		return members.flatMap { ($0 as? LocalisableStringEntryProvider)?.localisableEntries ?? [] }
+	}
 }

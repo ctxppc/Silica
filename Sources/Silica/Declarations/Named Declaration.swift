@@ -9,12 +9,12 @@ protocol NamedDeclaration : Declaration {
 	/// The declaration's fully-qualified name within its module.
 	///
 	/// The localised qualified name includes the name of any ancestors but not the module name.
-	var localQualifiedName: String { get }
+	var internalFullyQualifiedName: String { get }
 	
 }
 
 extension NamedDeclaration {
-	var localQualifiedName: String {
+	var internalFullyQualifiedName: String {
 		return "\(ancestors.compactMap { ($0 as? ScopingDeclaration)?.qualifyingName }.joined(separator: ".")).\(name)"
 	}
 }
