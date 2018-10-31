@@ -6,8 +6,9 @@ import Foundation
 final class GenerationOperation : Operation {
 	
 	/// Creates a task with given source root URL and generated sources URL.
-	init(sourcesAt sourcesURL: URL, generatingAt generatedSourcesURL: URL, tableAt tableURL: URL?) {
+	init(sourcesAt sourcesURL: URL, excludingAt excludedSourcesURL: URL?, generatingAt generatedSourcesURL: URL, tableAt tableURL: URL?) {
 		self.sourcesURL = sourcesURL
+		self.excludedSourcesURL = excludedSourcesURL
 		self.generatedSourcesURL = generatedSourcesURL
 		self.tableURL = tableURL
 	}
@@ -15,10 +16,13 @@ final class GenerationOperation : Operation {
 	/// The location of the sources. It must be a readable file or directory.
 	let sourcesURL: URL
 	
+	/// The location of the excluded sources, or `nil` if no sources are to be excluded. If relative, it's resolved against `sourcesURL`.
+	let excludedSourcesURL: URL?
+	
 	/// The location of the generated sources. It must be a writeable file or directory.
 	let generatedSourcesURL: URL
 	
-	/// The location of the localisation table.
+	/// The location of the localisation table, or `nil` if no table is to be created or updated.
 	let tableURL: URL?
 	
 	override func main() {

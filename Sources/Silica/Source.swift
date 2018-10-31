@@ -18,21 +18,25 @@ final class Source {
 	///
 	/// - Throws: An error if loading or parsing the source fails.
 	init(at url: URL) throws {
-		
-		self.url = url
-		text = try String(contentsOf: url)
-		
-		let decoder = BasicValueDecoder(value: try SourceKittenFramework.Structure(file: File(pathDeferringReading: url.path)).dictionary)
-		decoder.convertedKeyValue = { "key.\($0.lowercased())" }
-		
-		let structure = try decoder.decode(Structure.self)
-		if let error = structure.issues.first(where: { $0.severity == .error }) {
-			throw error
+		do {
+			
+			self.url = url
+			text = try String(contentsOf: url)
+			
+			let decoder = BasicValueDecoder(value: try SourceKittenFramework.Structure(file: File(pathDeferringReading: url.path)).dictionary)
+			decoder.convertedKeyValue = { "key.\($0.lowercased())" }
+			
+			let structure = try decoder.decode(Structure.self)
+			if let error = structure.issues.first(where: { $0.severity == .error }) {
+				throw error
+			}
+			
+			declarations = structure.declarations
+			issues = structure.issues
+			
+		} catch {
+			throw Error(underlyingError: error, sourceURL: url)
 		}
-		
-		declarations = structure.declarations
-		issues = structure.issues
-		
 	}
 	
 	/// The structure of a source.
@@ -72,7 +76,7 @@ final class Source {
 	let issues: [Issue]
 	
 	/// A warning or error thrown by the compiler.
-	struct Issue : Error, Decodable {
+	struct Issue : Swift.Error, Decodable {
 		
 		/// The relevant line.
 		let line: Int
@@ -89,6 +93,22 @@ final class Source {
 		
 		/// The compiler-provided description of the issue.
 		let description: String
+		
+	}
+	
+	/// A error in a source file.
+	struct Error : Swift.Error, CustomStringConvertible {
+		
+		/// The error that occurred.
+		let underlyingError: Swift.Error
+		
+		/// The URL of the source.
+		let sourceURL: URL
+		
+		// See protocol.
+		var description: String {
+			return "Error \(underlyingError) in source at \(sourceURL)"
+		}
 		
 	}
 	

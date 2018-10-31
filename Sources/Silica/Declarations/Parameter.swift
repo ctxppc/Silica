@@ -12,8 +12,9 @@ final class Parameter : Declaration {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
 		try type(of: self).decodeKind(in: container)
-		name = try container.decode(key: .name)
-		argumentType = try container.decode(key: .typeName)
+		name = try container.decodeIfPresent(key: .name)
+		guard let argumentType = try container.decodeIfPresent(String.self, forKey: .typeName) else { throw DecodingError.unsupportedParameter }
+		self.argumentType = argumentType
 	}
 	
 	/// The type of the parameter, or `nil` if the parameter is unnamed.
@@ -26,5 +27,12 @@ final class Parameter : Declaration {
 	
 	// See protocol.
 	var parent: Declaration?
+	
+	enum DecodingError : Error {
+		
+		/// The parameter cannot be decoded because it's of an unsupported format.
+		case unsupportedParameter
+		
+	}
 	
 }

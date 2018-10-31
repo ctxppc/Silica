@@ -21,18 +21,21 @@ struct LocalisableStringConformance {
 	/// The source of the conformance.
 	var source: GeneratedSource {
 		return .block(
-			lead: "extension \(conformingType.internalFullyQualifiedName)",
+			lead: "extension \(conformingType.internalFullyQualifiedName) {",
 			body: [
+				.singleLine(""),
 				.block(
 					lead: "var identifier: String {",
 					body: [identifierSource],
 					tail: "}"
 				),
+				.singleLine(""),
 				.block(
 					lead: "var arguments: [CVarArg] {",
 					body: [argumentsSource],
 					tail: "}"
-				)
+				),
+				.singleLine("")
 			],
 			tail: "}"
 		)

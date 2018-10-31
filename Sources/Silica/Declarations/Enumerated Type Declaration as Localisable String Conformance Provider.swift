@@ -10,7 +10,7 @@ extension EnumeratedTypeDeclaration : LocalisableStringConformanceProvider {
 		
 		let identifierSource = GeneratedSource.block(
 			lead:	"switch self {",
-			body:	elements.map { element in .singleLine("case \(element.name):\treturn \(element.localisationIdentifier)") },
+			body:	elements.map { element in .singleLine("case .\(element.name):\treturn \"\(element.localisationIdentifier)\"") },
 			tail:	"}"
 		)
 		

@@ -8,9 +8,10 @@ final class Module {
 	/// Initialises and loads a module.
 	///
 	/// - Parameter url: The location of the module; it can be a single file.
+	/// - Parameter excludedSourcesURL: The location of the excluded sources, or `nil` if no sources are to be excluded. Relative URLs are resolved against `url`.
 	///
 	/// - Throws: An error if loading a source fails.
-	init(at url: URL) throws {
+	init(at url: URL, excludingAt excludedSourcesURL: URL? = nil) throws {
 		
 		self.url = url
 		
@@ -23,12 +24,17 @@ final class Module {
 		let enumerator = FileManager.default.enumerator(
 			at:							url,
 			includingPropertiesForKeys:	[.typeIdentifierKey],
-			options:					[.skipsPackageDescendants],
+			options:					[.skipsPackageDescendants, .skipsHiddenFiles],
 			errorHandler:				{ _, error in
 											enumerationError = error
 											return false
 										}
 		)
+		
+		let excludedURL: URL? = {
+			guard let url = excludedSourcesURL else { return nil }
+			return URLComponents(url: url, resolvingAgainstBaseURL: true)?.url(relativeTo: url)
+		}()
 		
 		guard let urls = enumerator else {
 			sources = []
@@ -36,8 +42,15 @@ final class Module {
 		}
 		
 		sources = try urls.compactMap { url in
+			
 			let url = url as! URL
+			guard url != excludedURL else {
+				urls.skipDescendants()
+				return nil
+			}
+			
 			return try Source.isSource(at: url) ? Source(at: url) : nil
+			
 		}
 		
 		if let error = enumerationError {

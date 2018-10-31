@@ -21,6 +21,10 @@ struct AnyDeclaration : Decodable {
 				return
 			} catch DeclarationDecodingError.incorrectKind {
 				continue
+			} catch DeclarationDecodingError.unsupportedKind {
+				break
+			} catch Parameter.DecodingError.unsupportedParameter {
+				break
 			}
 		}
 		

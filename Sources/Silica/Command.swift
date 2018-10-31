@@ -9,13 +9,14 @@ final class Command : Operation {
 	override init() {
 		
 		parser = ArgumentParser(
-			usage:		"<sources> -c <conformances> -l <localisation tables>",
+			usage:		"<sources> -c <conformances> -l <localisation tables> -e <excluded source path>",
 			overview:	"Generates localisable string files from Swift source files."
 		)
 		
 		sourcesArgument = parser.add(positional: "source files", kind: PathArgument.self, optional: true, usage: "The source file or the root directory containing the source files to process. When running Silica as part of an Xcode build phase, omit this parameter to use the input files/directories or, if no inputs provided, the source root.")
 		conformanceArgument = parser.add(option: "--conformances", shortName: "-c", kind: PathArgument.self, usage: "The file where the generated protocol and its conformances are to be placed. When running Silica as part of an Xcode build phase, omit this option to write to the phase's output file or directory. When not running as part of a build phase, omit this option to write to “Localisable String.swift” under the source root.")
 		localisationsArgument = parser.add(option: "--localisations", shortName: "-l", kind: PathArgument.self, usage: "The localisation table file to create or update. No localisation table is created or updated if this option is omitted.")
+		excludedPathArgument = parser.add(option: "--exclude", shortName: "-e", kind: PathArgument.self, usage: "A path in the source directory to exclude. If omitted, no file is excluded. Relative paths are resolved against the source directory.")
 		
 		super.init()
 		
@@ -25,6 +26,7 @@ final class Command : Operation {
 	private let sourcesArgument: PositionalArgument<PathArgument>
 	private let conformanceArgument: OptionArgument<PathArgument>
 	private let localisationsArgument: OptionArgument<PathArgument>
+	private let excludedPathArgument: OptionArgument<PathArgument>
 	
 	private let arguments = CommandLine.arguments.dropFirst()
 	private let environment = ProcessInfo.processInfo.environment
@@ -43,6 +45,7 @@ final class Command : Operation {
 		
 		guard let sourceRootPath = result.get(sourcesArgument)?.path.asString ?? environment["SCRIPT_INPUT_FILE_0"] ?? environment["SRCROOT"] else { throw Error.noSourcePath }
 		let sourceRootURL = URL(fileURLWithPath: sourceRootPath)
+		let excludedSourcesURL = result.get(excludedPathArgument).flatMap { URL(fileURLWithPath: $0.path.asString) }
 		
 		let generatedSourcesURL: Foundation.URL
 		if let generatedSourcesPath = result.get(conformanceArgument)?.path.asString ?? environment["SCRIPT_OUTPUT_FILE_0"] {
@@ -53,7 +56,7 @@ final class Command : Operation {
 		
 		let localisationTableURL = result.get(localisationsArgument).flatMap { URL(fileURLWithPath: $0.path.asString) }
 		
-		let operation = GenerationOperation(sourcesAt: sourceRootURL, generatingAt: generatedSourcesURL, tableAt: localisationTableURL)
+		let operation = GenerationOperation(sourcesAt: sourceRootURL, excludingAt: excludedSourcesURL, generatingAt: generatedSourcesURL, tableAt: localisationTableURL)
 		operation.start()
 		if let error = operation.error {
 			throw error

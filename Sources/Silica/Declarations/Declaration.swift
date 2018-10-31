@@ -21,7 +21,8 @@ extension Declaration {
 	
 	/// Decodes the kind in the container and throws an error if it doesn't match `kind`.
 	static func decodeKind(in container: KeyedDecodingContainer<DeclarationCodingKey>) throws {
-		let encodedKind = try container.decode(SwiftDeclarationKind.self, forKey: .kind)
+		let encodedKindValue = try container.decode(String.self, forKey: .kind)
+		guard let encodedKind = SwiftDeclarationKind(rawValue: encodedKindValue) else { throw DeclarationDecodingError.unsupportedKind(encodedKindValue) }
 		if encodedKind != kind {
 			throw DeclarationDecodingError.incorrectKind(encodedKind, expected: kind)
 		}
@@ -41,6 +42,9 @@ enum DeclarationDecodingError : Error {
 	
 	/// The container encodes a different kind of declaration than the one expected by `Self`.
 	case incorrectKind(SwiftDeclarationKind, expected: SwiftDeclarationKind)
+	
+	/// The container encodes an unsupported kind of declaration or the container doesn't encode a declaration.
+	case unsupportedKind(String)
 	
 }
 

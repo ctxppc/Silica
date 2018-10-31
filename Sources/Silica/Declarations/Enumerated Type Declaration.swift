@@ -15,8 +15,8 @@ final class EnumeratedTypeDeclaration : TypeDeclaration {
 		try type(of: self).decodeKind(in: container)
 		name = try container.decode(key: .name)
 		accessibility = try container.decode(key: .accessibility)
-		conformances = try container.decode(key: .inheritedTypes)
-		members = try container.decode([AnyDeclaration].self, forKey: .substructure).compactMap { $0.base }
+		conformances = try container.decodeIfPresent(key: .inheritedTypes) ?? []
+		members = try container.decodeIfPresent([AnyDeclaration].self, forKey: .substructure)?.compactMap { $0.base } ?? []
 		members.bind(toParent: self)
 	}
 	
@@ -53,7 +53,9 @@ final class EnumeratedTypeDeclaration : TypeDeclaration {
 
 		// See protocol.
 		init(from decoder: Decoder) throws {
-			elements = try decoder.container(keyedBy: DeclarationCodingKey.self).decode(key: .substructure)
+			let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
+			try type(of: self).decodeKind(in: container)
+			elements = try container.decode(key: .substructure)
 		}
 		
 		/// The case declaration's elements.
