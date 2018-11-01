@@ -42,10 +42,12 @@ final class GenerationOperation : Operation {
 			print("warning: Silica did not find any localisable entries in the module at \(sourcesURL).")
 		}
 		
+		let tableName: String
 		if let tableURL = tableURL {
 			
 			guard tableURL.pathExtension.caseInsensitiveCompare("strings") == .orderedSame else { throw TableError.unsupportedFormat }
 			let table = try LocalisationTable(at: tableURL)
+			tableName = tableURL.deletingPathExtension().lastPathComponent
 			
 			for entry in localisableEntries {
 				table[entry.rawValue] = table[entry.rawValue] ?? ""
@@ -53,6 +55,8 @@ final class GenerationOperation : Operation {
 			
 			try table.save()
 			
+		} else {
+			tableName = "Localizable"	// TODO: Correct default value?
 		}
 		
 		let conformances = module.localisableStringConformances
@@ -65,7 +69,7 @@ final class GenerationOperation : Operation {
 				import Foundation
 				import os
 
-				\(localisableStringProtocol)
+				\(localisableStringProtocolSource(tableName: tableName))
 
 				\(conformances.map { $0.source.stringValue() }.joined(separator: "\n\n"))
 				""".write(to: generatedSourcesURL, atomically: false, encoding: .utf8)
@@ -77,7 +81,7 @@ final class GenerationOperation : Operation {
 				import Foundation
 				import os
 
-				\(localisableStringProtocol)
+				\(localisableStringProtocolSource(tableName: tableName))
 				""".write(to: generatedSourcesURL.appendingPathComponent("Localisable String.swift", isDirectory: false), atomically: false, encoding: .utf8)
 
 			for conformance in conformances {

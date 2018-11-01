@@ -56,6 +56,7 @@ final class EnumeratedTypeDeclaration : TypeDeclaration {
 			let container = try decoder.container(keyedBy: DeclarationCodingKey.self)
 			try type(of: self).decodeKind(in: container)
 			elements = try container.decode(key: .substructure)
+			elements.bind(toParent: self)
 		}
 		
 		/// The case declaration's elements.

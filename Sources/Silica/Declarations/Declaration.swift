@@ -60,3 +60,16 @@ extension Sequence where Self.Element == Declaration {
 	}
 	
 }
+
+extension Sequence where Self.Element : Declaration {
+	
+	/// Assigns `parent` as the parent of the declarations in `self`.
+	///
+	/// - Parameter parent: The (new) parent of the declarations in `self`.
+	func bind(toParent parent: Declaration) {
+		for child in self {
+			child.parent = parent
+		}
+	}
+	
+}
