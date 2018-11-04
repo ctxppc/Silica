@@ -10,16 +10,20 @@ extension EnumeratedTypeDeclaration : LocalisableStringConformanceProvider {
 		
 		let identifierSource = GeneratedSource.block(
 			lead:	"switch self {",
-			body:	elements.map { element in .singleLine("case .\(element.name):\treturn \"\(element.localisationIdentifier)\"") },
+			body:	elements.map { element in .singleLine("case .\(element.name):\treturn \"\(LocalisableStringEntry(for: element).rawValue)\"") },
 			tail:	"}"
 		)
 		
-		let caseLines = elements.map { element -> String in
+		var hasParameters = false
+		
+		let argumentCases = elements.map { element -> String in
 			
 			let parameters = element.parameters
 			if parameters.isEmpty {
 				return "case .\(element.name):\treturn []"
 			}
+			
+			hasParameters = true
 			
 			let parameterPairs: [(pattern: String, argument: String)] = zip(parameters, 0...).map {
 				let (parameter, index) = $0
@@ -40,11 +44,11 @@ extension EnumeratedTypeDeclaration : LocalisableStringConformanceProvider {
 			
 		}
 		
-		let argumentSource = GeneratedSource.block(
+		let argumentSource = hasParameters ? GeneratedSource.block(
 			lead:	"switch self {",
-			body:	caseLines.map { .singleLine($0) },
+			body:	argumentCases.map { .singleLine($0) },
 			tail:	"}"
-		)
+		) : .singleLine("return []")
 		
 		return nestedConformances.appending(.init(
 			for:				self,

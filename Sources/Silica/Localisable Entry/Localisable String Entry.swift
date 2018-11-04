@@ -50,6 +50,18 @@ struct LocalisableStringEntry {
 	
 }
 
+extension LocalisableStringEntry {
+	
+	/// Creates a localisable entry that mirrors a given case declaration element.
+	init(for element: EnumeratedTypeDeclaration.CaseDeclaration.Element) {
+		self.init(
+			name:		element.internalFullyQualifiedName.replacingOccurrences(of: "ViewController.", with: ".").replacingOccurrences(of: "String.", with: "."),
+			parameters:	element.parameters.map(LocalisableStringEntry.Parameter.init(for:))
+		)
+	}
+	
+}
+
 extension LocalisableStringEntry.Parameter {
 	
 	/// Creates a localisable entry parameter that mirrors a given parameter declaration.
