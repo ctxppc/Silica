@@ -30,7 +30,11 @@ struct LocalisableStringEntry {
 		
 		/// The parameter as a string representation.
 		var rawValue: String {
-			return "\(label ?? "_"): \(valueType.rawValue)"
+			if let label = label {
+				return "\(label): \(valueType.rawValue)"
+			} else {
+				return valueType.rawValue
+			}
 		}
 		
 	}

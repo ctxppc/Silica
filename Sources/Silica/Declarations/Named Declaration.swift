@@ -15,6 +15,6 @@ protocol NamedDeclaration : Declaration {
 
 extension NamedDeclaration {
 	var internalFullyQualifiedName: String {
-		return ancestors.compactMap { ($0 as? NamedDeclaration)?.name }.appending(name).joined(separator: ".")
+		return ancestors.reversed().compactMap { ($0 as? NamedDeclaration)?.name }.appending(name).joined(separator: ".")
 	}
 }
