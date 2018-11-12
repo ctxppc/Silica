@@ -78,14 +78,14 @@ final class Module {
 	
 }
 
-extension Module : LocalisableStringEntryProvider {
-	var localisableEntries: [LocalisableStringEntry] {
-		return sources.flatMap { $0.localisableEntries }
-	}
-}
-
-extension Module : LocalisableStringConformanceProvider {
+extension Module : LocalisableStringProvider {
+	
 	var localisableStringConformances: [LocalisableStringConformance] {
 		return sources.flatMap { $0.localisableStringConformances }
 	}
+	
+	var localisableStringEntries: [LocalisableStringEntry] {
+		return sources.flatMap { $0.localisableStringEntries }
+	}
+	
 }

@@ -3,7 +3,7 @@
 import SourceKittenFramework
 
 /// A declaration of a structure type, introduced by the `struct` keyword.
-final class StructureTypeDeclaration : TypeDeclaration, LocalisableStringEntryProvider, LocalisableStringConformanceProvider {
+final class StructureTypeDeclaration : TypeDeclaration {
 	
 	// See protocol.
 	static let kind = SwiftDeclarationKind.struct

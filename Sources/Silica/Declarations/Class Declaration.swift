@@ -3,7 +3,7 @@
 import SourceKittenFramework
 
 /// A declaration of a class, introduced by the `class` keyword.
-final class ClassDeclaration : TypeDeclaration, LocalisableStringEntryProvider, LocalisableStringConformanceProvider {
+final class ClassDeclaration : TypeDeclaration, LocalisableStringProvider {
 	
 	// See protocol.
 	static let kind = SwiftDeclarationKind.class

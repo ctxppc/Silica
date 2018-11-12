@@ -1,10 +1,11 @@
 // Silica © 2018 Constantino Tsarouhas
 
-extension EnumeratedTypeDeclaration : LocalisableStringConformanceProvider {
+extension EnumeratedTypeDeclaration : LocalisableStringProvider {
+	
 	var localisableStringConformances: [LocalisableStringConformance] {
 		
 		guard accessibility >= .internal else { return [] }
-		let nestedConformances = members.flatMap { ($0 as? LocalisableStringConformanceProvider)?.localisableStringConformances ?? [] }
+		let nestedConformances = members.flatMap { ($0 as? LocalisableStringProvider)?.localisableStringConformances ?? [] }
 		
 		guard declaresLocalisableStringConformance else { return nestedConformances }
 		
@@ -57,4 +58,18 @@ extension EnumeratedTypeDeclaration : LocalisableStringConformanceProvider {
 		))
 		
 	}
+	
+	var localisableStringEntries: [LocalisableStringEntry] {
+		
+		guard accessibility >= .internal else { return [] }
+		
+		let nestedEntries = members.flatMap { ($0 as? LocalisableStringProvider)?.localisableStringEntries ?? [] }
+		if conformances.contains(where: { $0.name == localisableStringProtocolName }) {
+			return elements.map(LocalisableStringEntry.init(for:)) + nestedEntries
+		} else {
+			return nestedEntries
+		}
+		
+	}
+	
 }

@@ -37,7 +37,7 @@ final class GenerationOperation : Operation {
 		
 		let module = try Module(at: sourcesURL)
 		
-		let localisableEntries = module.localisableEntries
+		let localisableEntries = module.localisableStringEntries
 		if localisableEntries.isEmpty {
 			print("warning: Silica did not find any localisable entries in the module at \(sourcesURL).")
 		}
