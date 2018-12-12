@@ -5,13 +5,13 @@ extension EnumeratedTypeDeclaration : LocalisableStringProvider {
 	var localisableStringConformances: [LocalisableStringConformance] {
 		
 		guard accessibility >= .internal else { return [] }
-		let nestedConformances = members.flatMap { ($0 as? LocalisableStringProvider)?.localisableStringConformances ?? [] }
+		let nestedConformances = Array(members.lazy.compactMap { $0 as? LocalisableStringProvider }.flatMap { $0.localisableStringConformances })
 		
 		guard declaresLocalisableStringConformance else { return nestedConformances }
 		
 		let identifierSource = GeneratedSource.block(
 			lead:	"switch self {",
-			body:	elements.map { element in .singleLine("case .\(element.name):\treturn \"\(LocalisableStringEntry(for: element).rawValue)\"") },
+			body:	elements.map { element in .singleLine("case .\(element.name):\treturn \"\(LocalisableStringEntry(for: element).tableEntryIdentifier)\"") },
 			tail:	"}"
 		)
 		
@@ -62,14 +62,21 @@ extension EnumeratedTypeDeclaration : LocalisableStringProvider {
 	var localisableStringEntries: [LocalisableStringEntry] {
 		
 		guard accessibility >= .internal else { return [] }
+		let nestedEntries = members.lazy.compactMap { $0 as? LocalisableStringProvider }.flatMap { $0.localisableStringEntries }
 		
-		let nestedEntries = members.flatMap { ($0 as? LocalisableStringProvider)?.localisableStringEntries ?? [] }
-		if conformances.contains(where: { $0.name == localisableStringProtocolName }) {
-			return elements.map(LocalisableStringEntry.init(for:)) + nestedEntries
-		} else {
-			return nestedEntries
-		}
+		guard declaresLocalisableStringConformance else { return .init(nestedEntries) }
 		
+		return elements.map { .init(for: $0) } + nestedEntries
+		
+	}
+	
+}
+
+extension LocalisableStringEntry {
+	
+	/// Creates a localisable string entry that mirrors a given case declaration element.
+	fileprivate init(for element: EnumeratedTypeDeclaration.CaseDeclaration.Element) {
+		self.init(for: element, parameters: element.parameters.map { .init(label: $0.name, valueType: .init(typeName: $0.argumentType)) })
 	}
 	
 }

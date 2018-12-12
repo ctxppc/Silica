@@ -50,7 +50,7 @@ final class GenerationOperation : Operation {
 			tableName = tableURL.deletingPathExtension().lastPathComponent
 			
 			for entry in localisableEntries {
-				table[entry.rawValue] = table[entry.rawValue] ?? ""
+				table[entry.tableEntryIdentifier] = table[entry.tableEntryIdentifier] ?? ""
 			}
 			
 			try table.save()

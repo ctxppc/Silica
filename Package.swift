@@ -16,5 +16,6 @@ let package = Package(
 	targets: [
 		.target(name: "Silica", dependencies: ["DepthKit", "SwiftPM", "SourceKittenFramework"]),
 		.testTarget(name: "SilicaTests", dependencies: ["Silica"])
-	]
+	],
+	swiftLanguageVersions: [.v4_2]
 )

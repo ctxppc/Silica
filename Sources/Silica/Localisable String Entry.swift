@@ -17,6 +17,15 @@ struct LocalisableStringEntry {
 		let valueType: ValueType
 		enum ValueType : String {
 			
+			/// Determines a value type from a given (Swift) type name.
+			init(typeName: String?) {
+				switch typeName {
+					case "Int"?:	self = .integer
+					case "Double"?:	self = .floatingPoint
+					default:		self = .string
+				}
+			}
+			
 			/// The parameter takes (formatted) integer arguments.
 			case integer = "%ld"
 			
@@ -39,8 +48,8 @@ struct LocalisableStringEntry {
 		
 	}
 	
-	/// The entry as a string representation.
-	var rawValue: String {
+	/// The entry's identifier in a localisable table.
+	var tableEntryIdentifier: String {
 		if parameters.isEmpty {
 			return name
 		} else {
@@ -52,30 +61,10 @@ struct LocalisableStringEntry {
 
 extension LocalisableStringEntry {
 	
-	/// Creates a localisable entry that mirrors a given case declaration element.
-	init(for element: EnumeratedTypeDeclaration.CaseDeclaration.Element) {
-		self.init(
-			name:		element.internalFullyQualifiedName.replacingOccurrences(of: "ViewController.", with: ".").replacingOccurrences(of: "String.", with: "."),
-			parameters:	element.parameters.map(LocalisableStringEntry.Parameter.init(for:))
-		)
-	}
-	
-}
-
-extension LocalisableStringEntry.Parameter {
-	
-	/// Creates a localisable entry parameter that mirrors a given parameter declaration.
-	init(for parameter: Parameter) {
-		
-		let type: LocalisableStringEntry.Parameter.ValueType
-		switch parameter.argumentType {
-			case "Int":		type = .integer
-			case "Double":	type = .floatingPoint
-			default:		type = .string
-		}
-		
-		self.init(label: parameter.name, valueType: type)
-		
+	/// Creates a localisable string entry for given named declaration with given parameters.
+	init(for declaration: NamedDeclaration, parameters: [Parameter]) {
+		let name = declaration.internalFullyQualifiedName.replacingOccurrences(of: "ViewController.", with: ".").replacingOccurrences(of: "String.", with: ".")
+		self.init(name: name, parameters: parameters)
 	}
 	
 }

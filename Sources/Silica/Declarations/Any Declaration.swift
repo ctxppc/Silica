@@ -10,7 +10,8 @@ struct AnyDeclaration : Decodable {
 		EnumeratedTypeDeclaration.self,
 		EnumeratedTypeDeclaration.CaseDeclaration.self,
 		ClassDeclaration.self,
-		Parameter.self
+		Parameter.self,
+		PropertyDeclaration.self
 	]
 	
 	init(from decoder: Decoder) throws {

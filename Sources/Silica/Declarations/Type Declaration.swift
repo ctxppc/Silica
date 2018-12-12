@@ -9,6 +9,15 @@ protocol TypeDeclaration : ScopingDeclaration, NamedDeclaration, AccessibleDecla
 	
 }
 
+extension TypeDeclaration {
+	
+	/// The type declaration's property declarations.
+	var propertyDeclarations: [PropertyDeclaration] {
+		return members.compactMap { $0 as? PropertyDeclaration }
+	}
+	
+}
+
 struct Conformance : Decodable {
 	
 	/// The name of the type being conformed to, to be evaluated in the lexical scope of the declaration declaring the conformance.
