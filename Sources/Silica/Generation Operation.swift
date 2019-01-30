@@ -35,7 +35,7 @@ final class GenerationOperation : Operation {
 	
 	private func run() throws {
 		
-		let module = try Module(at: sourcesURL)
+		let module = try Module(at: sourcesURL, excludingAt: excludedSourcesURL)
 		
 		let localisableEntries = module.localisableStringEntries
 		if localisableEntries.isEmpty {
