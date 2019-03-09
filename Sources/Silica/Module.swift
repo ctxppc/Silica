@@ -81,7 +81,9 @@ final class Module {
 extension Module : LocalisableStringProvider {
 	
 	var localisableStringConformances: [LocalisableStringConformance] {
-		return sources.flatMap { $0.localisableStringConformances }
+		return sources.flatMap { $0.localisableStringConformances }.sorted { preceding, following in
+			preceding.conformingType.internalFullyQualifiedName < following.conformingType.internalFullyQualifiedName
+		}
 	}
 	
 	var localisableStringEntries: [LocalisableStringEntry] {
