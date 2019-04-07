@@ -1,7 +1,7 @@
 // Silica © 2018 Constantino Tsarouhas
 
 import Foundation
-import Utility
+import SPMUtility
 
 /// The Silica command.
 final class Command : Operation {
@@ -43,18 +43,18 @@ final class Command : Operation {
 		
 		let result = try parser.parse(.init(arguments))
 		
-		guard let sourceRootPath = result.get(sourcesArgument)?.path.asString ?? environment["SCRIPT_INPUT_FILE_0"] ?? environment["SRCROOT"] else { throw Error.noSourcePath }
+		guard let sourceRootPath = result.get(sourcesArgument)?.path.pathString ?? environment["SCRIPT_INPUT_FILE_0"] ?? environment["SRCROOT"] else { throw Error.noSourcePath }
 		let sourceRootURL = URL(fileURLWithPath: sourceRootPath)
-		let excludedSourcesURL = result.get(excludedPathArgument).flatMap { URL(fileURLWithPath: $0.path.asString) }
+		let excludedSourcesURL = result.get(excludedPathArgument).flatMap { URL(fileURLWithPath: $0.path.pathString) }
 		
 		let generatedSourcesURL: Foundation.URL
-		if let generatedSourcesPath = result.get(conformanceArgument)?.path.asString ?? environment["SCRIPT_OUTPUT_FILE_0"] {
+		if let generatedSourcesPath = result.get(conformanceArgument)?.path.pathString ?? environment["SCRIPT_OUTPUT_FILE_0"] {
 			generatedSourcesURL = URL(fileURLWithPath: generatedSourcesPath)
 		} else {
 			generatedSourcesURL = sourceRootURL.appendingPathComponent("Localisable String.swift", isDirectory: false)
 		}
 		
-		let localisationTableURL = result.get(localisationsArgument).flatMap { URL(fileURLWithPath: $0.path.asString) }
+		let localisationTableURL = result.get(localisationsArgument).flatMap { URL(fileURLWithPath: $0.path.pathString) }
 		
 		let operation = GenerationOperation(sourcesAt: sourceRootURL, excludingAt: excludedSourcesURL, generatingAt: generatedSourcesURL, tableAt: localisationTableURL)
 		operation.start()
